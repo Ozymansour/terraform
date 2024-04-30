@@ -6,6 +6,11 @@ variable "server_port" {
   type = number
   default = 8080
 }
+
+output "public_ip" {
+  value = "aws_instance.example.public_ip"
+  description = "Public IP of web server"
+}
 resource "aws_instance" "example" {
   ami = "ami-0fb653ca2d3203ac1"
   instance_type = "t2.micro"
