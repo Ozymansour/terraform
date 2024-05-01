@@ -34,6 +34,8 @@ resource "aws_autoscaling_group" "example"{
   launch_configuration = aws_launch_configuration.example.name
   vpc_zone_identifier = data.aws_subnets.default.ids
 
+  target_group_arns = [aws_lb_target_group.asg.arn]
+  health_check_type = "ELB"
   min_size = 2
   max_size = 10
 
@@ -60,9 +62,9 @@ variable "server_port" {
   default = 8080
 }
 
-output "public_ip" {
-  value = aws_instance.example.public_ip
-  description = "Public IP of web server"
+output "alb_dns_name" {
+  value = aws_lb.example.dns_name
+  description = "The domain name of the load balancer"
 }
 
 resource "aws_lb" "example" {
@@ -120,6 +122,24 @@ resource "aws_lb_target_group" "asg" {
     timeout = 3
     healthy_threshold = 2
     unhealthy_threshold = 2
+  }
+  
+}
+
+
+resource "aws_lb_listener_rule" "asg" {
+  listener_arn = aws_lb_listener.http.arn
+  priority = 100
+
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.asg.arn
   }
   
 }
