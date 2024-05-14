@@ -18,12 +18,12 @@ resource "aws_launch_configuration" "example" {
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.instance.id]
 
-#   # Render the User Data script as a template
-#   user_data = templatefile("user-data.sh", {
-#     server_port = var.server_port
-#     db_address  = data.terraform_remote_state.db.outputs.address
-#     db_port     = data.terraform_remote_state.db.outputs.port
-#   })
+  # Render the User Data script as a template
+  user_data = templatefile("user-data.sh", {
+    server_port = var.server_port
+    db_address  = data.terraform_remote_state.db.outputs.address
+    db_port     = data.terraform_remote_state.db.outputs.port
+  })
 
   # Required when using a launch configuration with an auto scaling group.
   lifecycle {
