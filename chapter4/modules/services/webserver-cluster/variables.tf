@@ -6,7 +6,7 @@
 variable "db_remote_state_bucket" {
   description = "The name of the S3 bucket used for the database's remote state storage"
   type        = string
-  default = "terraform-state-147"
+  default = "terraform-state-134679"
 }
 
 variable "db_remote_state_key" {
