@@ -11,7 +11,7 @@ terraform {
 
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-0fb653ca2d3203ac1"
-  instance_type   = "t2.micro"
+  instance_type   = var.instance_type
   security_groups = [aws_security_group.instance.id]
 
   # Render the User Data script as a template
@@ -34,18 +34,18 @@ resource "aws_autoscaling_group" "example" {
   target_group_arns = [aws_lb_target_group.asg.arn]
   health_check_type = "ELB"
 
-  min_size = 2
-  max_size = 10
+  min_size = var.min_size
+  max_size = var.max_size
 
   tag {
     key                 = "Name"
-    value               = "terraform-asg-example"
+    value               = "${var.cluster_name}-example"
     propagate_at_launch = true
   }
 }
 
 resource "aws_security_group" "instance" {
-  name = var.instance_security_group_name
+  name = "${var.cluster_name}-instance"
 
   ingress {
     from_port   = var.server_port
@@ -56,7 +56,7 @@ resource "aws_security_group" "instance" {
 }
 
 resource "aws_lb" "example" {
-  name               = var.alb_name
+  name               = "${var.cluster_name}-example"
   load_balancer_type = "application"
   subnets            = data.aws_subnets.default.ids
   security_groups    = [aws_security_group.alb.id]
@@ -80,7 +80,7 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_lb_target_group" "asg" {
-  name     = var.alb_name
+  name     = "${var.cluster_name}-asg"
   port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
@@ -113,7 +113,7 @@ resource "aws_lb_listener_rule" "asg" {
 }
 
 resource "aws_security_group" "alb" {
-  name = var.alb_security_group_name
+  name = "${var.cluster_name}-alb"
 
   # Allow inbound HTTP requests
   ingress {
